@@ -9,6 +9,7 @@ use tokio_tungstenite::{
     MaybeTlsStream, WebSocketStream,
 };
 
+use crate::authentication::Authentication;
 use crate::client::ClientConfig;
 use crate::serializer::SerializerType;
 use crate::transport::{Transport, TransportError};
@@ -102,6 +103,19 @@ pub async fn connect(
 
     if !config.get_agent().is_empty() {
         request = request.header("User-Agent", config.get_agent());
+    }
+
+    match config.get_authentication() {
+        Authentication::Basic { username, password } => {
+            request = request.header(
+                "Authorization",
+                format!(
+                    "Basic {}",
+                    base64::encode(format!("{}:{}", username, password))
+                ),
+            );
+        }
+        Authentication::None => {}
     }
 
     let serializer_list = config

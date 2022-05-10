@@ -10,6 +10,7 @@ use tokio::sync::{
 };
 use url::*;
 
+use crate::authentication::*;
 pub use crate::common::*;
 use crate::core::*;
 use crate::error::*;
@@ -19,6 +20,8 @@ use crate::serializer::SerializerType;
 pub struct ClientConfig {
     /// Replaces the default user agent string
     agent: String,
+    /// The authentication method for the request
+    authentication: Authentication,
     /// A Set of all the roles the client will support
     roles: HashSet<ClientRole>,
     /// A priority list of which serializer to use when talking to the server
@@ -49,6 +52,7 @@ impl Default for ClientConfig {
         // Config with default values
         ClientConfig {
             agent: String::from(DEFAULT_AGENT_STR),
+            authentication: Authentication::None,
             roles: [
                 ClientRole::Caller,
                 ClientRole::Callee,
@@ -76,6 +80,16 @@ impl ClientConfig {
     /// Returns the currently set agent string
     pub fn get_agent(&self) -> &str {
         &self.agent
+    }
+
+    /// Sets the authentication header of the request to initialize the websocket connection
+    pub fn set_authentication(mut self, authentication: Authentication) -> Self {
+        self.authentication = authentication;
+        self
+    }
+    /// Returns the authentication method to connect
+    pub fn get_authentication(&self) -> Authentication {
+        self.authentication.clone()
     }
 
     /// Sets the maximum payload size which can be sent over the transport

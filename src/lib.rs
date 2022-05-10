@@ -1,3 +1,4 @@
+mod authentication;
 mod client;
 mod common;
 mod core;
@@ -6,6 +7,7 @@ mod message;
 mod serializer;
 mod transport;
 
+pub use authentication::Authentication;
 pub use client::{Client, ClientConfig, ClientState};
 pub use common::*;
 pub use error::*;

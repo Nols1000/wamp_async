@@ -14,6 +14,7 @@ repository = "https://github.com/elast0ny/wamp_async"
 
 [dependencies]
 async-trait = "0.1"
+base64 = "0.13.0"
 futures = "0.3"
 log = "0.4"
 native-tls = "0.2"
