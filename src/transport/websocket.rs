@@ -98,7 +98,7 @@ impl Transport for WsCtx {
 pub async fn connect(
     url: &url::Url,
     config: &ClientConfig,
-) -> Result<(Box<dyn Transport + Send>, SerializerType), TransportError> {
+) -> Result<(Box<dyn Transport + Send>, Option<SerializerType>), TransportError> {
     let mut request = Request::builder().uri(url.as_ref());
 
     if !config.get_agent().is_empty() {
@@ -178,19 +178,10 @@ pub async fn connect(
         }
     }
 
-    let picked_serializer = match picked_serializer {
-        Some(s) => s,
-        None => {
-            return Err(TransportError::SerializerNotSupported(
-                "<unknown>".to_string(),
-            ))
-        }
-    };
-
     Ok((
         Box::new(WsCtx {
             is_bin: match picked_serializer {
-                SerializerType::MsgPack => true,
+                Some(SerializerType::MsgPack) => true,
                 _ => false,
             },
             client,

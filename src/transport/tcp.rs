@@ -321,7 +321,7 @@ pub async fn connect(
     host_port: u16,
     is_tls: bool,
     config: &ClientConfig,
-) -> Result<(Box<dyn Transport + Send>, SerializerType), TransportError> {
+) -> Result<(Box<dyn Transport + Send>, Option<SerializerType>), TransportError> {
     let host_addr = format!("{}:{}", host_ip, host_port);
     let mut handshake = HandshakeCtx::new();
     let mut msg_size: u32 = MAX_MSG_SZ;
@@ -365,7 +365,7 @@ pub async fn connect(
             };
         }
 
-        return Ok((Box::new(TcpTransport { sock: stream }), *serializer));
+        return Ok((Box::new(TcpTransport { sock: stream }), Some(*serializer)));
     }
 
     Err(TransportError::ConnectionFailed)

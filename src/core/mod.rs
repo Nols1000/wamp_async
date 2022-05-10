@@ -129,8 +129,9 @@ impl<'a> Core<'a> {
         debug!("Connected with serializer : {:?}", serializer_type);
 
         let serializer: Box<dyn SerializerImpl + Send> = match serializer_type {
-            SerializerType::Json => Box::new(json::JsonSerializer {}),
-            SerializerType::MsgPack => Box::new(msgpack::MsgPackSerializer {}),
+            Some(SerializerType::Json) => Box::new(json::JsonSerializer {}),
+            Some(SerializerType::MsgPack) => Box::new(msgpack::MsgPackSerializer {}),
+            _ => Box::new(json::JsonSerializer {}),
         };
 
         //let (rpc_result_w, rpc_result_r) = mpsc::unbounded_channel();
