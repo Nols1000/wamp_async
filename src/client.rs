@@ -3,6 +3,7 @@ use std::future::Future;
 use futures::FutureExt;
 
 use log::*;
+use native_tls::Certificate;
 use tokio::sync::oneshot;
 use tokio::sync::{
     mpsc, mpsc::UnboundedReceiver, mpsc::UnboundedSender,
@@ -26,6 +27,8 @@ pub struct ClientConfig {
     max_msg_size: u32,
     /// When using a secure transport, this option disables certificate validation
     ssl_verify: bool,
+    /// Additional Root Certificates to consider when validating the certificate for secure transport
+    tls_root_certificates: Vec<Certificate>,
     /// Additional WebSocket headers on establish connection
     websocket_headers: HashMap<String, String>,
 }
@@ -58,6 +61,7 @@ impl Default for ClientConfig {
             serializers: vec![SerializerType::Json, SerializerType::MsgPack],
             max_msg_size: 0,
             ssl_verify: true,
+            tls_root_certificates: vec![],
             websocket_headers: HashMap::new(),
         }
     }
@@ -116,6 +120,22 @@ impl ClientConfig {
     /// Returns whether certificate validation is enabled
     pub fn get_ssl_verify(&self) -> bool {
         self.ssl_verify
+    }
+
+    /// Adds a TLS root certificate to be considered when validating the certificate
+    pub fn add_tls_root_certificates(mut self, val: Certificate) -> Self {
+        self.tls_root_certificates.push(val);
+        self
+    }
+    /// Sets the TLS root certificates to be considered when validating the certificate
+    /// This will overwrite all previous changes
+    pub fn set_tls_root_certificates(mut self, val: Vec<Certificate>) -> Self {
+        self.tls_root_certificates = val;
+        self
+    }
+    /// Returns all TLS root certificates to be considered when validating the certificate
+    pub fn get_tls_root_certificates(&self) -> &Vec<Certificate> {
+        &self.tls_root_certificates
     }
 
     pub fn add_websocket_header(mut self, key: String, val: String) -> Self {

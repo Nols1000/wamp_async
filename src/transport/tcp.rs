@@ -391,6 +391,10 @@ pub async fn connect_tls(
     let stream = connect_raw(host_url, host_port).await?;
     let mut tls_cfg = TlsConnector::builder();
 
+    for cert in cfg.get_tls_root_certificates() {
+        tls_cfg.add_root_certificate(cert.clone());
+    }
+
     if !cfg.get_ssl_verify() {
         tls_cfg.danger_accept_invalid_certs(true);
     }
